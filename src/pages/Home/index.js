@@ -17,14 +17,17 @@ const Home = () => {
   const [selectedCity, setSelectedCity] = useState('0')
 
   const handleNavigateToPoints = () => {
-    navigation.navigate('Points')
+    navigation.navigate('Points', {
+      uf: selectedUf,
+      city: selectedCity
+    })
   }
 
   useEffect(() => {
     const url = 'https://servicodados.ibge.gov.br/api/v1/localidades/estados'
     axios.get(url).then(response => {
       const ufAbbrevs = response.data.map(uf => uf.sigla)
-      setUfs(ufAbbrevs)
+      setUfs(ufAbbrevs.sort((a, b) => a > b ? 1 : -1))
     })
   }, [])
 
