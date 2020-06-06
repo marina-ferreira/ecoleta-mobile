@@ -35,11 +35,10 @@ const Points = () => {
       params: {
         city: 'Minas',
         uf: 'MG',
-        items: [1, 2]
+        items: [1, 2, 3, 4, 5, 6]
       }
     })
     .then(response => {
-      console.log(response.data)
       setPoints(response.data)
     })
   }, [])
@@ -66,8 +65,8 @@ const Points = () => {
     navigation.goBack()
   }
 
-  const handleNavigateToDetail = () => {
-    navigation.navigate('Detail')
+  const handleNavigateToDetail = id => {
+    navigation.navigate('Detail', { point_id: id })
   }
 
   const handleSelectItem = id => {
@@ -106,7 +105,7 @@ const Points = () => {
                 <Marker
                   key={String(point.id)}
                   style={styles.mapMarker}
-                  onPress={handleNavigateToDetail}
+                  onPress={() => handleNavigateToDetail(point.id)}
                   coordinate={{
                     latitude: Number(point.latitude),
                     longitude: Number(point.longitude)

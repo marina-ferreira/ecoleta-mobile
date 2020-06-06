@@ -1,7 +1,6 @@
-import React from 'react'
-import Constants from 'expo-constants'
+import React, { useState, useEffect } from 'react'
 import { RectButton } from 'react-native-gesture-handler'
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation, useRoute } from '@react-navigation/native'
 import { Feather as Icon, FontAwesome } from '@expo/vector-icons'
 import {
   View,
@@ -12,13 +11,28 @@ import {
   SafeAreaView
 } from 'react-native'
 
+import api from 'app/services/api'
+
 import marketIcon from 'app/assets/market.png'
 
 const Detail = () => {
   const navigation = useNavigation()
+  const route = useRoute()
+  const routeParams = route.params
+  const [data, setData] = useState({})
+
+  useEffect(() => {
+    api.get(`points/${routeParams.point_id}`).then(response => {
+      setData(response.data)
+    })
+  }, [])
 
   const handleNavigateBack = () => {
     navigation.goBack()
+  }
+
+  if (!data) {
+    return null
   }
 
   return (
@@ -30,8 +44,10 @@ const Detail = () => {
 
         <Image style={styles.pointImage} source={marketIcon} />
 
-        <Text style={styles.pointName}>Mercadão</Text>
-        <Text style={styles.pointItems}>Lâmpadas, Óleo de Cozinha</Text>
+        <Text style={styles.pointName}>{data.name}</Text>
+        <Text style={styles.pointItems}>
+          {data?.items?.map(item => item.title).join(', ')}
+        </Text>
 
         <View style={styles.address}>
           <Text style={styles.addressTitle}>Endereço</Text>
