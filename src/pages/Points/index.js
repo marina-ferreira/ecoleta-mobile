@@ -10,7 +10,7 @@ import {
   Alert
 } from 'react-native'
 import { Feather as Icon } from '@expo/vector-icons'
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation, useRoute } from '@react-navigation/native'
 import MapView, { Marker } from 'react-native-maps'
 import { SvgUri } from 'react-native-svg'
 import * as Location from 'expo-location'
@@ -21,6 +21,7 @@ import marketIcon from 'app/assets/market.png'
 
 const Points = () => {
   const navigation = useNavigation()
+  const route = useRoute()
   const [items, setItems] = useState([])
   const [points, setPoints] = useState([])
   const [selectedItems, setSelectedItems] = useState([])
@@ -31,17 +32,16 @@ const Points = () => {
   }, [])
 
   useEffect(() => {
+    if (selectedItems.length === 0) return
+
     api.get('/points', {
       params: {
-        city: 'Minas',
-        uf: 'MG',
-        items: [1, 2, 3, 4, 5, 6]
+        city: route.params.city,
+        uf: route.params.uf,
+        items: selectedItems
       }
-    })
-    .then(response => {
-      setPoints(response.data)
-    })
-  }, [])
+    }).then(response => setPoints(response.data))
+  }, [selectedItems])
 
   useEffect(() => {
     const loadPosition = async () => {
