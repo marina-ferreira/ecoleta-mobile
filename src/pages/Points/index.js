@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import Constants from 'expo-constants'
 import {
   View,
@@ -13,10 +13,18 @@ import { useNavigation } from '@react-navigation/native'
 import MapView, { Marker } from 'react-native-maps'
 import { SvgUri } from 'react-native-svg'
 
+import api from 'app/services/api'
+
 import marketIcon from 'app/assets/market.png'
 
 const Points = () => {
   const navigation = useNavigation()
+  const [items, setItems] = useState([])
+  const [selectedItems, setSelectedItems] = useState([])
+
+  useEffect(() => {
+    api.get('/items').then(response => setItems(response.data))
+  }, [])
 
   const handleNavigateBack = () => {
     navigation.goBack()
@@ -24,6 +32,19 @@ const Points = () => {
 
   const handleNavigateToDetail = () => {
     navigation.navigate('Detail')
+  }
+
+  const handleSelectItem = id => {
+    const alreadySelected = selectedItems.findIndex(item => item === id)
+
+    if (alreadySelected >= 0) {
+      const filteredItems = selectedItems.filter(item => item !== id)
+      setSelectedItems(filteredItems)
+    } else {
+      setSelectedItems([...selectedItems, id])
+    }
+
+    console.log({selectedItems})
   }
 
   return (
@@ -72,41 +93,21 @@ const Points = () => {
           contentContainerStyle={{ paddingHorizontal: 20 }}
           horizontal
         >
-          <TouchableOpacity style={styles.item}>
-            <SvgUri width={42} height={42} uri="https://282ad7469b30.ngrok.io/uploads/oleo.svg" />
+          {items.map(item => (
+            <TouchableOpacity
+              style={[
+                styles.item,
+                selectedItems.includes(item.id) ? styles.selectedItem : {}
+              ]}
+              key={String(item.id)}
+              onPress={() => handleSelectItem(item.id)}
+              activeOpacity={0.5}
+            >
+              <SvgUri width={42} height={42} uri={item.image_url} />
 
-            <Text style={styles.itemTitle}>Óleo</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.item}>
-            <SvgUri width={42} height={42} uri="https://282ad7469b30.ngrok.io/uploads/oleo.svg" />
-
-            <Text style={styles.itemTitle}>Óleo</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.item}>
-            <SvgUri width={42} height={42} uri="https://282ad7469b30.ngrok.io/uploads/oleo.svg" />
-
-            <Text style={styles.itemTitle}>Óleo</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.item}>
-            <SvgUri width={42} height={42} uri="https://282ad7469b30.ngrok.io/uploads/oleo.svg" />
-
-            <Text style={styles.itemTitle}>Óleo</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.item}>
-            <SvgUri width={42} height={42} uri="https://282ad7469b30.ngrok.io/uploads/oleo.svg" />
-
-            <Text style={styles.itemTitle}>Óleo</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.item}>
-            <SvgUri width={42} height={42} uri="https://282ad7469b30.ngrok.io/uploads/oleo.svg" />
-
-            <Text style={styles.itemTitle}>Óleo</Text>
-          </TouchableOpacity>
+              <Text style={styles.itemTitle}>{item.title}</Text>
+            </TouchableOpacity>
+          ))}
         </ScrollView>
       </View>
     </>
