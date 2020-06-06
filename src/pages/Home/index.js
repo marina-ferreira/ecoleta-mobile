@@ -2,7 +2,7 @@ import React from 'react'
 
 import { View, Image, StyleSheet, Text, ImageBackground } from 'react-native'
 import { RectButton } from 'react-native-gesture-handler'
-import { Feather as FeatherIcon } from '@expo/vector-icons'
+import { Feather as Icon } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native'
 
 import logo from 'app/assets/logo.png'
@@ -31,7 +31,7 @@ const Home = () => {
       <View style={styles.footer}>
         <RectButton style={styles.button} onPress={handleNavigateToPoints}>
           <View style={styles.buttonIcon}>
-            <FeatherIcon name="arrow-right" color="#fff" size={24} />
+            <Icon name="arrow-right" color="#fff" size={24} />
           </View>
           <Text style={styles.buttonText}>Entrar</Text>
         </RectButton>
