@@ -1,14 +1,35 @@
 import React from 'react'
 
-import { View, Image, StyleSheet } from 'react-native'
+import { View, Image, StyleSheet, Text, ImageBackground } from 'react-native'
+import { RectButton } from 'react-native-gesture-handler'
+import { Feather as FeatherIcon } from '@expo/vector-icons'
 
 import logo from 'app/assets/logo.png'
+import homeBg from 'app/assets/home-background.png'
 
 const Home = () => {
   return (
-    <View style={styles.container}>
-      <Image source={logo} />
-    </View>
+    <ImageBackground
+      style={styles.container}
+      source={homeBg}
+      imageStyle={{ width: 274, height: 368 }}
+    >
+      <View style={styles.main}>
+        <Image source={logo} />
+
+        <Text style={styles.title}>Seu marketplace de coleta de resíduos</Text>
+        <Text style={styles.description}>Ajudamos pessoas a encontrarem pontos de coleta de forma eficiente</Text>
+      </View>
+
+      <View style={styles.footer}>
+        <RectButton style={styles.button} onPress={() => {}}>
+          <View style={styles.buttonIcon}>
+            <FeatherIcon name="arrow-right" color="#fff" size={24} />
+          </View>
+          <Text style={styles.buttonText}>Entrar</Text>
+        </RectButton>
+      </View>
+    </ImageBackground>
   )
 }
 
@@ -18,6 +39,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 32,
+    backgroundColor: '#f0f0f5'
   },
 
   main: {
