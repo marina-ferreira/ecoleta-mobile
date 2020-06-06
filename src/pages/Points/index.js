@@ -22,11 +22,26 @@ import marketIcon from 'app/assets/market.png'
 const Points = () => {
   const navigation = useNavigation()
   const [items, setItems] = useState([])
+  const [points, setPoints] = useState([])
   const [selectedItems, setSelectedItems] = useState([])
   const [initialPos, setInitialPos] = useState([0, 0])
 
   useEffect(() => {
     api.get('/items').then(response => setItems(response.data))
+  }, [])
+
+  useEffect(() => {
+    api.get('/points', {
+      params: {
+        city: 'Minas',
+        uf: 'MG',
+        items: [1, 2]
+      }
+    })
+    .then(response => {
+      console.log(response.data)
+      setPoints(response.data)
+    })
   }, [])
 
   useEffect(() => {
@@ -77,7 +92,7 @@ const Points = () => {
         <Text style={styles.description}>Encontre no mapa um ponto de coleta.</Text>
 
         <View style={styles.mapContainer}>
-          {initialPos[0] !== 0 && (
+          {points.length > 0 && initialPos[0] !== 0 && (
             <MapView
               style={styles.map}
               initialRegion={{
@@ -87,22 +102,25 @@ const Points = () => {
                 longitudeDelta: 0.014
               }}
             >
-              <Marker
-                style={styles.mapMarker}
-                onPress={handleNavigateToDetail}
-                coordinate={{
-                    latitude: -23.5954058,
-                    longitude: -46.8543619
+              {points.map(point => (
+                <Marker
+                  key={String(point.id)}
+                  style={styles.mapMarker}
+                  onPress={handleNavigateToDetail}
+                  coordinate={{
+                    latitude: Number(point.latitude),
+                    longitude: Number(point.longitude)
                   }}
-              >
-                <View>
-
-                  <Image
-                    style={styles.mapMarkerImage}
-                    source={marketIcon}
-                  />
-                </View>
-              </Marker>
+                >
+                  <View>
+                    <Image
+                      style={styles.mapMarkerImage}
+                      source={marketIcon}
+                    />
+                    <Text style={styles.mapMarkerTitle}>{point.name}</Text>
+                  </View>
+                </Marker>
+              ))}
             </MapView>
           )}
         </View>
