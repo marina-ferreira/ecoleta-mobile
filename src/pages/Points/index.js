@@ -6,12 +6,14 @@ import {
   TouchableOpacity,
   Text,
   ScrollView,
-  Image
+  Image,
+  Alert
 } from 'react-native'
 import { Feather as Icon } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native'
 import MapView, { Marker } from 'react-native-maps'
 import { SvgUri } from 'react-native-svg'
+import * as Location from 'expo-location'
 
 import api from 'app/services/api'
 
@@ -21,9 +23,28 @@ const Points = () => {
   const navigation = useNavigation()
   const [items, setItems] = useState([])
   const [selectedItems, setSelectedItems] = useState([])
+  const [initialPos, setInitialPos] = useState([0, 0])
 
   useEffect(() => {
     api.get('/items').then(response => setItems(response.data))
+  }, [])
+
+  useEffect(() => {
+    const loadPosition = async () => {
+      const { status } = await Location.requestPermissionsAsync()
+
+      if (status !== 'granted') {
+        Alert.alert('Oooops...', 'Precisamos da sua permissão para obter a localização')
+        return
+      }
+
+      const location = await Location.getCurrentPositionAsync()
+      const { latitude, longitude } = location.coords
+
+      setInitialPos([latitude, longitude])
+    }
+
+    loadPosition()
   }, [])
 
   const handleNavigateBack = () => {
@@ -43,8 +64,6 @@ const Points = () => {
     } else {
       setSelectedItems([...selectedItems, id])
     }
-
-    console.log({selectedItems})
   }
 
   return (
@@ -58,32 +77,34 @@ const Points = () => {
         <Text style={styles.description}>Encontre no mapa um ponto de coleta.</Text>
 
         <View style={styles.mapContainer}>
-          <MapView
-            style={styles.map}
-            initialRegion={{
-              latitude: -23.5954058,
-              longitude: -46.8543619,
-              latitudeDelta: 0.014,
-              longitudeDelta: 0.014
-            }}
-          >
-            <Marker
-              style={styles.mapMarker}
-              onPress={handleNavigateToDetail}
-              coordinate={{
-                  latitude: -23.5954058,
-                  longitude: -46.8543619
-                }}
+          {initialPos[0] !== 0 && (
+            <MapView
+              style={styles.map}
+              initialRegion={{
+                latitude: initialPos[0],
+                longitude: initialPos[1],
+                latitudeDelta: 0.014,
+                longitudeDelta: 0.014
+              }}
             >
-              <View>
+              <Marker
+                style={styles.mapMarker}
+                onPress={handleNavigateToDetail}
+                coordinate={{
+                    latitude: -23.5954058,
+                    longitude: -46.8543619
+                  }}
+              >
+                <View>
 
-                <Image
-                  style={styles.mapMarkerImage}
-                  source={marketIcon}
-                />
-              </View>
-            </Marker>
-          </MapView>
+                  <Image
+                    style={styles.mapMarkerImage}
+                    source={marketIcon}
+                  />
+                </View>
+              </Marker>
+            </MapView>
+          )}
         </View>
       </View>
 
